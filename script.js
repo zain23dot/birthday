@@ -146,7 +146,6 @@ function changeSlide(direction) {
 // ==========================================================================
 function initFloatingHearts() {
     const container = document.getElementById('hearts-container');
-    const heartsSymbols = ['❤️', '💖', '💕', '✨', '🌸'];
     
     setInterval(() => {
         // Stop generating when background processing load isn't necessary
@@ -260,7 +259,8 @@ function animateFireworks() {
     fireworks.forEach(p => { p.update(); p.draw(); });
     
     // Only launch background fireworks when looking at the final page celebration
-    const finalPageActive = document.getElementById('page-5').classList.contains('active');
+    const finalPage = document.getElementById('page-5');
+    const finalPageActive = finalPage ? finalPage.classList.contains('active') : false;
     if(Math.random() < 0.03 && finalPageActive && !document.hidden) {
         spawnFirework();
     }
