@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday My Love! ✨</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght=700&family=Poppins:wght=300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -33,7 +33,7 @@
             position: relative;
         }
 
-        /* --- BACKGROUND BACKGROUND EFFECTS --- */
+        /* --- BACKGROUND EFFECTS --- */
         #fireworks-canvas {
             position: fixed;
             top: 0;
@@ -300,12 +300,16 @@
         .balloon {
             position: absolute; bottom: -100px; width: 50px; height: 65px;
             border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-            animation: floatUp 6s ease-in forwards;
+            animation: balloonUp 6s ease-in forwards;
         }
         .balloon::after {
             content: ""; position: absolute; bottom: -8px; left: 50%;
             transform: translateX(-50%); border-left: 5px solid transparent;
-            border-right: 5px solid transparent; border-bottom: 8px solid inherit;
+            border-right: 5px solid transparent; border-bottom: 8px solid rgba(255,255,255,0.3);
+        }
+        @keyframes balloonUp {
+            0% { transform: translateY(0) translateX(0); opacity: 1; }
+            100% { transform: translateY(-120vh) translateX(30px); opacity: 0; }
         }
 
         /* --- RESPONSIVE MOBILE DESIGN --- */
@@ -329,7 +333,7 @@
     <div class="balloon-zone" id="balloon-zone"></div>
 
     <section id="page-1" class="page active">
-        <div class="glass-card text-center" style="text-align: center;">
+        <div class="glass-card text-center">
             <div class="lock-icon"><i class="fas fa-heart"></i></div>
             <h2 class="title-text">For Your Eyes Only</h2>
             <p>Hint: Enter '1234' or change it in the code!</p>
@@ -340,7 +344,7 @@
     </section>
 
     <section id="page-2" class="page">
-        <div class="glass-card style="text-align: center;" style="text-align: center;">
+        <div class="glass-card text-center">
             <h2 class="title-text" id="gift-header">You Have a Gift! 🎁</h2>
             <div id="gift-box" onclick="openGift()">
                 <div class="gift-lid"></div>
@@ -384,7 +388,7 @@
     </section>
 
     <section id="page-4" class="page">
-        <div class="glass-card style="text-align: center;" style="text-align: center;">
+        <div class="glass-card text-center">
             <h2 class="title-text">Our Best Memories 📸</h2>
             <div class="slider">
                 <div class="slide active">
@@ -396,108 +400,4 @@
                     <p class="slide-caption">Laughing with you is my favorite thing. 👑</p>
                 </div>
                 <div class="slide">
-                    <img src="https://picsum.photos/id/106/500/350" alt="Memory 3">
-                    <p class="slide-caption">Forever and always, right by your side. 🔒</p>
-                </div>
-                <button class="slide-btn prev" onclick="changeSlide(-1)">❮</button>
-                <button class="slide-btn next" onclick="changeSlide(1)">❯</button>
-            </div>
-            <button onclick="nextPage(5)" class="btn">The Ultimate Surprise 🎁</button>
-        </div>
-    </section>
-
-    <section id="page-5" class="page">
-        <div class="glass-card style="text-align: center;" style="text-align: center;">
-            <h1 class="shimmer-text">To the Moon & Back 🌙</h1>
-            <p class="final-letter">
-                Dearest [Her Name], this little space on the internet belongs entirely to you today. May your day be filled with endless laughter, magic, and sweet surprises. Countless balloons, fireworks, and hearts are celebrating YOU right now!
-            </p>
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="triggerConfetti()" class="btn"><i class="fas fa-bomb"></i> Explode Confetti!</button>
-                <button onclick="triggerMassBalloons()" class="btn"><i class="fas fa-cloud"></i> Release Balloons!</button>
-            </div>
-        </div>
-    </section>
-
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <script>
-        /* --- CONFIGURATION --- */
-        const CORRECT_PASSCODE = "1234"; // CHANGE_ME: Put your custom password here
-        const typewriterParagraph = "You are my best friend, my soulmate, and my greatest adventure. Today is all about celebrating the wonderful person you are...";
-
-        /* --- MUSIC UTILITIES --- */
-        const music = document.getElementById('bg-music');
-        const musicBtn = document.getElementById('music-toggle');
-        
-        function toggleMusic() {
-            if (music.paused) {
-                music.play().catch(e => console.log("Audio playback waiting for user click."));
-                musicBtn.classList.add('playing');
-                musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            } else {
-                music.pause();
-                musicBtn.classList.remove('playing');
-                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
-            }
-        }
-
-        /* --- PASSCODE SCREEN WORKFLOW --- */
-        function checkPasscode() {
-            const input = document.getElementById('passcode-input').value;
-            const error = document.getElementById('error-msg');
-            if(input === CORRECT_PASSCODE) {
-                toggleMusic(); // Starts music seamlessly on successful unlock
-                nextPage(2);
-            } else {
-                error.innerText = "Oops! Wrong code, try again love! ❤️";
-                setTimeout(() => error.innerText = "", 3000);
-            }
-        }
-
-        /* --- PAGE NAVIGATION --- */
-        function nextPage(pageNum) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.getElementById(`page-${pageNum}`).classList.add('active');
-            
-            if(pageNum === 5) {
-                startFireworks();
-                triggerMassBalloons();
-                triggerConfetti();
-            }
-        }
-
-        /* --- GIFT OPEN CONTAINER --- */
-        function openGift() {
-            const box = document.getElementById('gift-box');
-            if(!box.classList.contains('open')) {
-                box.classList.add('open');
-                triggerConfetti();
-                setTimeout(() => {
-                    box.style.display = 'none';
-                    document.getElementById('gift-header').style.display = 'none';
-                    const msgDiv = document.getElementById('gift-message');
-                    msgDiv.classList.remove('hidden');
-                    msgDiv.classList.add('fade-in');
-                    runTypewriter();
-                }, 600);
-            }
-        }
-
-        /* --- TYPEWRITER EFFECT --- */
-        let typeIndex = 0;
-        function runTypewriter() {
-            if (typeIndex < typewriterParagraph.length) {
-                document.getElementById("typewriter-text").innerHTML += typewriterParagraph.charAt(typeIndex);
-                typeIndex++;
-                setTimeout(runTypewriter, 45);
-            }
-        }
-
-        /* --- PREMIUM SLIDER --- */
-        let currentSlide = 0;
-        function changeSlide(direction) {
-            const slides = document.querySelectorAll('.slide');
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + direction + slides.length) % slides.length;
-            slides[currentSlide].classList.add('
+                    <img src
