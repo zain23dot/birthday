@@ -1,0 +1,273 @@
+// ==========================================================================
+// 1. GLOBAL ENGINE CONFIGURATION
+// ==========================================================================
+// CONFIGURATION: Set your custom passcode here!
+const SECRET_PASSCODE = "1204"; // <-- CHANGE THIS to your desired passcode
+const TYPEWRITER_SPEED = 45; 
+const LETTERS_TEXT = "To the most incredible soul in the universe... Happy Birthday! Today is all about you, and I wanted to wrap all my love up into this little digital space. Let's look back at our journey... ✨";
+
+// State Tracker
+let currentSlideIdx = 0;
+let typewriterStarted = false;
+
+// ==========================================================================
+// 2. TIMED PAGE TRANSITION INFRASTRUCTURE
+// ==========================================================================
+function nextPage(pageNum) {
+    const activePage = document.querySelector('.page.active');
+    
+    // Smoothly phase out current page
+    if (activePage) {
+        activePage.classList.remove('active');
+        setTimeout(() => { activePage.style.display = 'none'; }, 800);
+    }
+
+    // Phase in target page seamlessly
+    setTimeout(() => {
+        const nextTarget = document.getElementById(`page-${pageNum}`);
+        if(nextTarget) {
+            nextTarget.style.display = 'flex'; // Aligns perfectly with our centering layout
+            setTimeout(() => {
+                nextTarget.classList.add('active');
+                
+                // Trigger page-specific event anchors
+                if(pageNum === 5) {
+                    triggerMassBalloons();
+                    triggerConfetti();
+                }
+            }, 50);
+        }
+    }, 400);
+}
+
+// ==========================================================================
+// 3. SECURITY GATEWAY (PASSCODE VERIFICATION)
+// ==========================================================================
+function checkPasscode() {
+    const entered = document.getElementById('passcode-input').value;
+    const errorMsg = document.getElementById('error-msg');
+    
+    if(entered === SECRET_PASSCODE) {
+        nextPage(2);
+        startMusic();
+        triggerConfetti();
+    } else {
+        errorMsg.innerText = "Incorrect passcode! Try again, love. ❤️";
+        errorMsg.classList.add('fade-in');
+        setTimeout(() => { errorMsg.innerText = ""; }, 3000);
+    }
+}
+
+// ==========================================================================
+// 4. SMART BACKGROUND MUSIC CONTROLLER
+// ==========================================================================
+const audio = document.getElementById('bg-music');
+const musicBtn = document.getElementById('music-toggle');
+
+function startMusic() {
+    audio.play()
+        .then(() => {
+            musicBtn.classList.add('playing');
+            musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        })
+        .catch(() => console.log("Audio pipeline awaiting definitive gesture array."));
+}
+
+function toggleMusic() {
+    if (audio.paused) {
+        audio.play();
+        musicBtn.classList.add('playing');
+        musicBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    } else {
+        audio.pause();
+        musicBtn.classList.remove('playing');
+        musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+    }
+}
+
+// Bind direct invocation handling to container target
+musicBtn.onclick = toggleMusic;
+
+// ==========================================================================
+// 5. GIFT REVEAL ENGINE & TYPEWRITER STRINGS
+// ==========================================================================
+function openGift() {
+    const giftBox = document.getElementById('gift-box');
+    if (giftBox.classList.contains('open')) return;
+
+    giftBox.classList.add('open');
+    triggerConfetti();
+    
+    setTimeout(() => {
+        giftBox.style.display = 'none';
+        document.getElementById('gift-header').style.display = 'none';
+        
+        const giftMsgContainer = document.getElementById('gift-message');
+        giftMsgContainer.classList.remove('hidden');
+        giftMsgContainer.classList.add('fade-in');
+        
+        triggerConfetti();
+        startTypewriter();
+    }, 600);
+}
+
+function startTypewriter() {
+    if (typewriterStarted) return;
+    typewriterStarted = true;
+    
+    let i = 0;
+    const targetElement = document.getElementById("typewriter-text");
+    targetElement.innerHTML = ""; // Clear fallback structures
+    
+    function type() {
+        if (i < LETTERS_TEXT.length) {
+            targetElement.innerHTML += LETTERS_TEXT.charAt(i);
+            i++;
+            setTimeout(type, TYPEWRITER_SPEED);
+        }
+    }
+    type();
+}
+
+// ==========================================================================
+// 6. GALLERY SLIDER NAVIGATOR
+// ==========================================================================
+function changeSlide(direction) {
+    const slides = document.querySelectorAll('.slide');
+    if(slides.length === 0) return;
+    
+    slides[currentSlideIdx].classList.remove('active');
+    currentSlideIdx = (currentSlideIdx + direction + slides.length) % slides.length;
+    slides[currentSlideIdx].classList.add('active');
+}
+
+// ==========================================================================
+// 7. COMPONENT PARTICLE ENGINES (HEARTS, BALLOONS, CONFETTI)
+// ==========================================================================
+function initFloatingHearts() {
+    const container = document.getElementById('hearts-container');
+    const heartsSymbols = ['❤️', '💖', '💕', '✨', '🌸'];
+    
+    setInterval(() => {
+        // Stop generating when background processing load isn't necessary
+        if(document.hidden) return;
+
+        const heart = document.createElement('div');
+        heart.classList.add('heart-particle', 'fas', 'fa-heart');
+        
+        // Random placement values across runtime matrix
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.fontSize = Math.random() * 12 + 14 + 'px';
+        heart.style.animationDuration = Math.random() * 2 + 4 + 's';
+        
+        container.appendChild(heart);
+        setTimeout(() => { heart.remove(); }, 5000);
+    }, 380);
+}
+
+function triggerConfetti() {
+    confetti({
+        particleCount: 140,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#ff65a3', '#7a42f4', '#ffb703', '#ffffff']
+    });
+}
+
+function triggerMassBalloons() {
+    const zone = document.getElementById('balloon-zone');
+    const colors = ['#ff65a3', '#7a42f4', '#ffb703', '#3a86ff', '#06d6a0'];
+    
+    for(let i = 0; i < 25; i++) {
+        setTimeout(() => {
+            const balloon = document.createElement('div');
+            balloon.classList.add('balloon');
+            
+            const pickedColor = colors[Math.floor(Math.random() * colors.length)];
+            balloon.style.left = Math.random() * 90 + 'vw';
+            balloon.style.backgroundColor = pickedColor;
+            balloon.style.color = pickedColor; // Feeds currentColor to border ribbon accent
+            balloon.style.transform = `scale(${Math.random() * 0.3 + 0.8})`;
+            balloon.style.animationDuration = Math.random() * 3 + 5 + 's';
+            
+            zone.appendChild(balloon);
+            setTimeout(() => { balloon.remove(); }, 8000);
+        }, i * 120);
+    }
+}
+
+// ==========================================================================
+// 8. GRAPHICS ARRAY: CANVAS VECTOR FIREWORKS ENGINE
+// ==========================================================================
+const canvas = document.getElementById('fireworks-canvas');
+const ctx = canvas.getContext('2d');
+let fireworks = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class FireworkParticle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.radius = Math.random() * 2 + 1.5;
+        // Radial velocity expansion array logic
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 1;
+        this.velocity = { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed };
+        this.alpha = 1;
+        this.decay = Math.random() * 0.012 + 0.012;
+    }
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore();
+    }
+    update() {
+        this.velocity.x *= 0.98;
+        this.velocity.y *= 0.98;
+        this.velocity.y += 0.05; // Gravity pull vector
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.alpha -= this.decay;
+    }
+}
+
+function spawnFirework() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * (canvas.height * 0.5);
+    const colors = ['#ff65a3', '#7a42f4', '#ffec99', '#3a86ff', '#06d6a0'];
+    const chosenColor = colors[Math.floor(Math.random() * colors.length)];
+    
+    for (let i = 0; i < 50; i++) {
+        fireworks.push(new FireworkParticle(x, y, chosenColor));
+    }
+}
+
+function animateFireworks() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    fireworks = fireworks.filter(p => p.alpha > 0);
+    fireworks.forEach(p => { p.update(); p.draw(); });
+    
+    // Only launch background fireworks when looking at the final page celebration
+    const finalPageActive = document.getElementById('page-5').classList.contains('active');
+    if(Math.random() < 0.03 && finalPageActive && !document.hidden) {
+        spawnFirework();
+    }
+    
+    requestAnimationFrame(animateFireworks);
+}
+
+// Initialize Loop Systems
+initFloatingHearts();
+animateFireworks();
